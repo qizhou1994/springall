@@ -1,0 +1,48 @@
+server:
+  port: 8888
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:7500/eureka/
+  instance:
+      hostname: 127.0.0.1
+      #服务过期时间配置,超过这个时间没有接收到心跳EurekaServer就会将这个实例剔除
+      #注意，EurekaServer一定要设置eureka.server.eviction-interval-timer-in-ms否则这个配置无效，这个配置一般为服务刷新时间配置的三倍
+      #默认90s
+      lease-expiration-duration-in-seconds: 15
+      #服务刷新时间配置，每隔这个时间会主动心跳一次
+      #默认30s
+      lease-renewal-interval-in-seconds: 5
+
+
+
+spring:
+  application:
+    name: service-zuul
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0
+      max-file-size: 100MB
+      max-request-size: 100MB
+  redis:
+    host: 124.70.199.159
+    port: 6379
+    password: 123456
+    timeout: 1000
+
+zuul:
+  routes:
+    test1: # 该配置方式中，hello1只是给路由一个名称，可以任意起名。
+      path: /test1/**
+      service-id: test1 # service-id对应服务在注册中心的名称
+    zuul: # 该配置方式中，hello1只是给路由一个名称，可以任意起名。
+      path: /zuul/**
+      service-id: service-zuul # service-id对应服务在注册中心的名称
+#    hell2:
+#      path: /hello2/**
+#      url: http://127.0.0.1:8762 这样就将/hello2/**映射到http://127.0.0.1:8762/，一旦使用这种方式不能使用服务降级Hytrix功能和负载均衡Ribbon，在实际开发中这种做法也是不可取的。
